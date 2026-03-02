@@ -81,9 +81,9 @@ docker-compose up -d
 5. Обновите конфигурацию подключения к MinIO:
 ```json
 "MinIO": {
-    "Endpoint": "http://6grain-minio.viki-solution.online",
-    "AccessKey":"sixgrain",
-    "SecretKey":"RmKnDBUnGmCHBAwv",
+    "Endpoint": "http://minio.example",
+    "AccessKey":"UserLogin",
+    "SecretKey":"UserPass",
     "Secure": false
 }
 ```
@@ -129,9 +129,9 @@ docker-compose up -d
 3. Обновите конфигурацию подключения к MinIO:
 ```json
 "MinIO": {
-    "Endpoint": "http://6grain-minio.viki-solution.online",
-    "AccessKey":"sixgrain",
-    "SecretKey":"RmKnDBUnGmCHBAwv",
+    "Endpoint": "http://minio.example",
+    "AccessKey":"UserLogin",
+    "SecretKey":"UserPass",
     "Secure": false
 }
 ```
@@ -162,11 +162,11 @@ docker-compose up -d
 ```
 5. Выполните публикацию проекта *выпонять внутри папки Masofa.Web.Monolith*
 ```bash
-sudo dotnet publish -c Release -o /srv/masofa-web-monolith
+sudo dotnet publish -c Release -o /path-to-publish/masofa-web-monolith
 ```
 6. Установите на папку и файлы в ней права на чтение и исполения файлоы
 ```bash
-cd /srv
+cd /path-to-publish
 sudo chmod -R 644 ./masofa-web-monolith
 ```
 7. Создайте файл /systemd/system/masofa-web-monolith.service , **если этого файла нет**, с таким содержимом
@@ -176,8 +176,8 @@ Description=Masofa Monolith WebAPI Service
 After=network.target
 
 [Service]
-WorkingDirectory=/srv/masofa-web-monolith
-ExecStart=/srv/masofa-web-monolith/Masofa.Web.Monolith
+WorkingDirectory=/path-to-publish/masofa-web-monolith
+ExecStart=/path-to-publish/masofa-web-monolith/Masofa.Web.Monolith
 Restart=always
 
 # Restart service after 10 seconds if the dotnet service crashes:
@@ -372,19 +372,19 @@ PASV_MAX_PORT=21010
     "Password": "geoserver" // copy from .env
   },
   "Landsat": { //Настройки доступа к Landsat
-    "MetadataApiUrl": "https://m2m.cr.usgs.gov/api/api/json/stable/scene-metadata",
-    "SearchApiUrl": "https://m2m.cr.usgs.gov/api/api/json/stable/scene-search",
-    "TokenApiUrl": "https://m2m.cr.usgs.gov/api/api/json/stable/login-token",
-    "UserName": "AvazIskandarov",
-    "Password": "gisteam2023@",
-    "Token": "hHxE446S_9hCIGPCp23cps7KOx4LagD01DnUsrg6wMF8yewZQq6jpaY0N8Kc1ah8",
+    "MetadataApiUrl": "https://url.example/api",
+    "SearchApiUrl": "https://url.example/search",
+    "TokenApiUrl": "https://url.example/auth",
+    "UserName": "username",
+    "Password": "userpassword",
+    "Token": "mysecuritytoken",
     "Paths": [],
     "Rows": []
   },
   "Sentinel": {//Настройки доступа к Sentinel
     "ApiUrl": "https://scihub.copernicus.eu/dhus",
-    "UserName": "avazbekiskandarov9812@gmail.com",
-    "Password": "Avazoxun@1998",
+    "UserName": "username",
+    "Password": "userpassword",
     "TokenApiUrl": "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token",
     "ProductSearchApiUrl": "https://catalogue.dataspace.copernicus.eu/odata/v1/Products",
     "ProductDownloadApiUrl": "https://download.dataspace.copernicus.eu/odata/v1/Products",
