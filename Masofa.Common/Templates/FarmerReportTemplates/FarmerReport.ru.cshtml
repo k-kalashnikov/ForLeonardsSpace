@@ -1,0 +1,823 @@
+﻿@using System
+@using Masofa.Common.Models.MasofaAnaliticReport
+@using RazorLight
+@using Newtonsoft.Json.Linq
+@model FarmerRecomendationReport
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Рекомендации фермерам</title>
+    <style>
+        :root {
+            --green: #396d55;
+            --ink: #202428;
+            --muted: #7d8a85;
+            --border: #DFE7E3;
+            --page-bg: #fff;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: #e0ebe4;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            color: var(--ink);
+            line-height: 1.4;
+        }
+
+        @@page {
+            size: A4;
+            margin: 12mm;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            box-sizing: border-box;
+            background: var(--page-bg);
+            margin: 12px auto;
+            padding: 14mm;
+            page-break-after: always;
+            position: relative;
+        }
+
+        /* Обложка */
+        .cover {
+            background: linear-gradient(135deg, #396d55 0%, #2d5a47 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30mm 20mm;
+        }
+
+        .cover-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 20px 0 10px;
+        }
+
+        .cover-subtitle {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .cover-footer {
+            position: absolute;
+            bottom: 14mm;
+            left: 14mm;
+            right: 14mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Основная страница */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-masofa {
+            width: 160px;
+            height: 36px;
+        }
+
+        .qr-code {
+            width: 80px;
+            height: 80px;
+            border: 1px solid var(--border);
+        }
+
+        .header-right {
+            text-align: right;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 10px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--green);
+            margin: 20px 0 10px;
+        }
+
+        h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 15px 0 8px;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 12px;
+            margin: 0 0 15px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+
+        .table th,
+        .table td {
+            border: 1px solid var(--border);
+            padding: 6px 8px;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .table th {
+            background-color: #f8faf8;
+            font-weight: 600;
+        }
+
+        .table-wrap {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .table.anomaly-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+        .table.anomaly-table th,
+        .table.anomaly-table td {
+            text-align: left; 
+            vertical-align: top;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            hyphens: auto;
+            font-size: 11px;
+            padding: 6px 8px;
+        }
+        .table.anomaly-table th.col-photo,
+        .table.anomaly-table td.col-photo {
+            width: 165px;
+            text-align: center;
+        }
+        .table.anomaly-table td.col-photo img {
+            width: 150px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 10px;
+        }
+        .table.anomaly-table th.col-short,
+        .table.anomaly-table td.col-short {
+            width: 90px;
+        }
+
+        .table-wrap {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .table.anomaly-table {
+            width: 100%;
+            table-layout: fixed;
+        }
+
+            .table.anomaly-table th,
+            .table.anomaly-table td {
+                vertical-align: top;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+            }
+
+                /* ключевое: фиксируем колонку и запрещаем “выползать” */
+                .table.anomaly-table th.col-photo,
+                .table.anomaly-table td.col-photo {
+                    width: 190px; /* подгони: 170–210 */
+                    text-align: center;
+                    overflow: hidden; /* чтобы не наезжало на соседей */
+                }
+
+            .table.anomaly-table img.photo {
+                display: block;
+                max-width: 100%; /* ВАЖНО: вписать в ширину колонки */
+                height: auto;
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                margin: 0 auto;
+            }
+
+        .chart img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .avoid {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        .print-footer {
+            position: absolute;
+            bottom: 14mm;
+            left: 14mm;
+            right: 14mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #667;
+        }
+    </style>
+</head>
+<body>
+    <!-- Page 1: Обложка -->
+    <section class="page cover">
+        @if (!string.IsNullOrEmpty(Model.MinistrySvg))
+        {
+        <div style="text-align: center; margin: 40px 0;">
+            <img src="data:image/svg+xml;base64,@Model.MinistrySvg" style="width: 250px; height: auto;" />
+        </div>
+        }
+        <h1 class="cover-title">Министерство сельского хозяйства<br>Республики Узбекистан</h1>
+        <h3 class="cover-subtitle">Анализ посевов и рекомендации</h3>
+        <div class="cover-footer">
+            <span>@Model.Header.ReportNumber • @Model.Header.ReportDate.ToString("dd.MM.yyyy")</span>
+            <span>Страница 1 из 6</span>
+        </div>
+    </section>
+
+    <!-- Page 2: Основная информация -->
+    <section class="page">
+        <div class="header-row">
+            <div class="header-left">
+                <img class="logo-masofa" src="data:image/svg+xml;base64,@Model.LogoSvgBase64" alt="MASOFA YER" />
+            </div>
+            <div class="header-right">
+                @Model.Header.ReportDate.ToString("dd.MM.yyyy")<br />
+                @Model.Header.ReportNumber
+            </div>
+        </div>
+
+        <p class="muted">
+            Данные рекомендации подготовлены на основе сведений из системы, спутникового мониторинга посевов и типовых агротехнических рекомендаций.
+        </p>
+
+        <!-- === Блок общей информации в сетке === -->
+        <h2>Общая информация</h2>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; font-size: 12px; position: relative;">
+            <div>
+                <strong>Наименование региона</strong><br />
+                @Model.Header.Region
+            </div>
+            <div>
+                <strong>Наименование культуры</strong><br />
+                @Model.Header.CropName
+            </div>
+            <div>
+                <strong>Кадастровый номер</strong><br />
+                @Model.Header.CadastralNumber
+            </div>
+            <div>
+                <strong>ID поля</strong><br />
+                @Model.Header.FieldIdText
+            </div>
+            <div>
+                <strong>Наименование района</strong><br />
+                @Model.Header.District
+            </div>
+            <div>
+                <strong>Площадь</strong><br />
+                @Model.Header.AreaHa Га
+            </div>
+            <div>
+                <strong>Координаты (WGS 84)</strong><br />
+                @Model.Header.Wgs84
+            </div>
+            <!-- Пустой блок для выравнивания -->
+            <div></div>
+
+            <!-- QR-код — абсолютное позиционирование -->
+            @if (!string.IsNullOrEmpty(Model.QrSvgBase64))
+            {
+            <div style="position: absolute; top: 30px; right: 90px; transform: translateX(10px); display: flex; align-items: center; justify-content: center; padding: 10px;">
+                <img src="data:image/svg+xml;base64,@Model.QrSvgBase64" alt="QR Code" style="width: 80px; height: 80px;" />
+            </div>
+            }
+        </div>
+
+        <!-- Почвенные данные -->
+        <h3>Данные о почве</h3>
+        <div class="muted">Тип почвы — <b>@Model.Header.SoilType</b></div>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>Дата анализа</th>
+                    <th>pH</th>
+                    <th>Гумус, %</th>
+                    <th>N (мг/кг)</th>
+                    <th>P (мг/кг)</th>
+                    <th>Песок, %</th>
+                    <th>Глина, %</th>
+                    <th>Плотность (г/см³)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Soil.Rows)
+                {
+                <tr>
+                    <td>@r.AnalysisDate.ToString("dd.MM.yyyy")</td>
+                    <td>@(r.Ph?.ToString("F1") ?? "—")</td>
+                    <td>@(r.HumusPercent?.ToString("F1") ?? "—")</td>
+                    <td>@(r.N?.ToString("F1") ?? "—")</td>
+                    <td>@(r.P?.ToString("F1") ?? "—")</td>
+                    <td>@(r.SandPercent?.ToString("F1") ?? "—")</td>
+                    <td>@(r.ClayPercent?.ToString("F1") ?? "—")</td>
+                    <td>@(r.Density?.ToString("F1") ?? "—")</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <h3>@Model.Fertilization.Title</h3>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>Культура</th>
+                    <th>Вид удобр.</th>
+                    <th>Навоз, кг/га</th>
+                    <th>N</th>
+                    <th>P</th>
+                    <th>K</th>
+                    <th>Весной</th>
+                    <th>Перед севом</th>
+                    <th>С севом</th>
+                    <th>Подкормка 1</th>
+                    <th>Подкормка 2</th>
+                    <th>Подкормка 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.Fertilization.Table.Crop</td>
+                    <td>@Model.Fertilization.Table.Manure</td>
+                    <td>@Model.Fertilization.Table.ManureKgHa</td>
+                    <td>@Model.Fertilization.Table.NKgHa</td>
+                    <td>@Model.Fertilization.Table.NKgHa</td>
+                    <td>@Model.Fertilization.Table.NKgHa</td>
+                    <td>@Model.Fertilization.Table.NKgHa</td>
+                    <td>@Model.Fertilization.Table.NKgHa</td>
+                    <td>@Model.Fertilization.Table.PKgHa</td>
+                    <td>@Model.Fertilization.Table.KKgHa</td>
+                    <td>@Model.Fertilization.Table.Spring</td>
+                    <td>@Model.Fertilization.Table.Spring</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <img src="data:image/svg+xml;base64,@Model.GrowthStageSvg" alt="Этапы развития" style="width: 100%; height: auto; max-width: 800px;" />
+        </div>
+
+        <h3 style="margin-top:18px">Этапы вегетационного развития</h3>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>Стадии</th>
+                    <th>Дни</th>
+                    <th>Сумма активных температур</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.GrowthStages.Rows)
+                {
+                <tr>
+                    <td>@r.Stage</td>
+                    <td>@r.Days</td>
+                    <td>@r.ActiveTempSum</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        <p class="muted">Текущая фаза: <b>@Model.GrowthStages.CurrentPhase</b></p>
+
+        <!-- Нормы полива -->
+        <h3>Нормы полива</h3>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>Культура</th>
+                    <th>Дождевание, m³/ha</th>
+                    <th>Капельное орошение, m³/ha</th>
+                    <th>Орошаемые борозды, m³/ha</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.Irrigation.CropName</td>
+                    <td>@Model.Irrigation.SprinklingM3Ha</td>
+                    <td>@Model.Irrigation.DripM3Ha</td>
+                    <td>@Model.Irrigation.FurrowM3Ha</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="print-footer">
+            <span>@Model.Header.ReportNumber • @Model.Header.ReportDate.ToString("dd.MM.yyyy")</span>
+            <span>Стр. 2 из 6</span>
+        </div>
+    </section>
+
+    <!-- Page 3: Погода -->
+    <!-- Page 3: Результаты мониторинга -->
+    <section class="page">
+        <h2>Результаты мониторинга</h2>
+
+        <!-- Прогноз погоды -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+            <div>
+                <strong>Прогноз погоды</strong><br />
+                <span>@Model.Weather.Region / @Model.Header.District</span>
+            </div>
+            <div class="muted">@Model.Header.ReportDate.ToString("dd.MM.yyyy")</div>
+        </div>
+
+        <!-- Блоки данных -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; font-size: 12px;">
+            <div>
+                <strong>Температура воздуха</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.AirTemp°C</span>
+            </div>
+            <div>
+                <strong>Влажность воздуха</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.AirHumidity%</span>
+            </div>
+            <div>
+                <strong>Скорость ветра</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.WindSpeed м/с</span>
+            </div>
+            <div>
+                <strong>Направление ветра</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.WindDir</span>
+            </div>
+            <div>
+                <strong>Осадки</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.PrecipMm мм</span>
+            </div>
+            <div>
+                <strong>Солнечная радиация</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.SolarJPerCm2 Дж/см²</span>
+            </div>
+            <!-- Пустой блок -->
+            <div></div>
+        </div>
+
+        <!-- Следующие 7 дней -->
+        <h3>Следующие 7 дней</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            @foreach (var day in Model.Weather.Next7Days.Take(7))
+            {
+                var icon = day.Icon == "sun" ? "☀️" : "🌧️";
+            <div style="text-align: center; padding: 10px; background: #f8faf8; border: 1px solid var(--border); border-radius: 5px; flex: 1;">
+                <div style="font-weight: bold;">@day.Date.DayOfWeek.ToString().Substring(0, 2)</div>
+                <div style="font-size: 12px;">@day.Date.Day</div>
+                <div style="margin: 5px 0;">@icon</div>
+                <div style="font-size: 14px; font-weight: bold;">+@day.DayTempC°C</div>
+            </div>
+            }
+        </div>
+
+        <!-- Графики -->
+        <h3>График температуры</h3>
+        <div class="avoid" style="margin-bottom: 15px;">
+            @if (!string.IsNullOrEmpty(Model.TempChartSvgBase64))
+            {
+                <img src="data:image/svg+xml;base64,@Model.TempChartSvgBase64" alt="Температура" style="width:100%; height:auto;" />
+            }
+        </div>
+
+        <h3>График осадков</h3>
+        <div class="avoid" style="margin-bottom: 15px;">
+            @if (!string.IsNullOrEmpty(Model.RainChartSvgBase64))
+            {
+                <img src="data:image/svg+xml;base64,@Model.RainChartSvgBase64" alt="Осадки" style="width:100%; height:auto;" />
+            }
+        </div>
+
+        <h3>Солнечная радиация</h3>
+        <div class="avoid" style="margin-bottom: 15px;">
+            @if (!string.IsNullOrEmpty(Model.SolarChartSvgBase64))
+            {
+                <img src="data:image/svg+xml;base64,@Model.SolarChartSvgBase64" alt="Солнечная радиация" style="width:100%; height:auto;" />
+            }
+        </div>
+
+        <h3>Суммарные (накопленные) климатические показатели</h3>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Σ(T°C>7)</th>
+                    <th>Σ(T°C>10)</th>
+                    <th>Σ(T°C>12)</th>
+                    <th>Σ(T°C>15)</th>
+                    <th>Осадки (mm)</th>
+                    <th>Излучение (MJ/m²)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.ClimaticSumm.Date</td>
+                    <td>@Model.ClimaticSumm.Temp7.ToString("F2")</td>
+                    <td>@Model.ClimaticSumm.Temp10.ToString("F2")</td>
+                    <td>@Model.ClimaticSumm.Temp12.ToString("F2")</td>
+                    <td>@Model.ClimaticSumm.Temp15.ToString("F2")</td>
+                    <td>@Model.ClimaticSumm.Fallout.ToString("F2")</td>
+                    <td>@Model.ClimaticSumm.Radiation.ToString("F2")</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Предупреждения -->
+        <h3>⚠️ Предупреждения об отклонениях</h3>
+        <div class="muted">
+            @Model.Monitoring.WarningText
+        </div>
+
+        <div class="print-footer">
+            <span>@Model.Header.ReportNumber • @Model.Header.ReportDate.ToString("dd.MM.yyyy")</span>
+            <span>Стр. 3 из 6</span>
+        </div>
+    </section>
+
+    <!-- Page 4: Удобрения и этапы -->
+    <section class="page">
+        <!-- Календарь мероприятий -->
+        <h2>Стандартный календарь агротехнических мероприятий</h2>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>Дней от посева</th>
+                    <th>Мероприятие</th>
+                    <th>Примечание</th>
+                    <th>Рекомендации к почве</th>
+                    <th>Дата выполнения</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Calendar.Rows)
+                {
+                <tr>
+                    <td>@row.DayOffset</td>
+                    <td>@row.Activity</td>
+                    <td>@row.Notes</td>
+                    <td>@row.Recommendation</td>
+                    <td>@row.ActualDate</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Информация о севообороте -->
+        <h3>Информация о севообороте</h3>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>Культура</th>
+                    <th>Планируемая дата посева</th>
+                    <th>Дата посева фактическая</th>
+                    <th>Площадь Га</th>
+                    <th>Дата сбора плановая</th>
+                    <th>Дата сбора фактическая</th>
+                    <th>Урожайность с гектара</th>
+                    <th>Уборка</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.CropRotation.Rows)
+                {
+                    <tr>
+                        <td>@row.CropName</td>
+                        <td>@(row.PlannedSowingDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                        <td>@(row.ActualSowingDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                        <td>@row.AreaHa.ToString("F1")</td>
+                        <td>@(row.PlannedHarvestDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                        <td>@(row.ActualHarvestDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                        <td>@row.YieldPerHectare.ToString("F1")</td>
+                        <td>@(row.HarvestDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h3>Удобрения, пестициды</h3>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Тип</th>
+                    <th>Имя</th>
+                    <th>Количество</th>
+                    <th>Единица измерения</th>
+                    <th>Культура</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.FertPest.Rows)
+                {
+                    <tr>
+                        <td>@row.Date</td>
+                        <td>@row.Type</td>
+                        <td>@row.Name</td>
+                        <td>@row.Quantity</td>
+                        <td>@row.UnitOfMeasurement</td>
+                        <td>@row.Crop</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="print-footer">
+            <span>@Model.Header.ReportNumber • @Model.Header.ReportDate.ToString("dd.MM.yyyy")</span>
+            <span>Стр. 4 из 6</span>
+        </div>
+    </section>
+
+    <!-- Page 5: Индексы -->
+    <section class="page">
+        <h2>Индексы растительности</h2>
+        
+        @if (Model.Indices.IndexImages != null && Model.Indices.IndexImages.Count > 0)
+        {
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #e0e0e0;">
+                <thead>
+                    <tr style="background-color: #f5f5f5;">
+                        <th style="padding: 12px; border: 1px solid #e0e0e0; text-align: left; font-weight: bold;">Индекс</th>
+                        <th style="padding: 12px; border: 1px solid #e0e0e0; text-align: center; font-weight: bold;">Значение</th>
+                        <th style="padding: 12px; border: 1px solid #e0e0e0; text-align: left; font-weight: bold;">Координаты аномалии</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var indexImage in Model.Indices.IndexImages)
+                    {
+                        <tr>
+                            <td style="padding: 12px; border: 1px solid #e0e0e0; vertical-align: top;">
+                                <strong>@indexImage.IndexType</strong>
+                            </td>
+                            <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: center; vertical-align: middle;">
+                                @if (!string.IsNullOrEmpty(indexImage.ImageBase64))
+                                {
+                                    <img src="data:image/png;base64,@indexImage.ImageBase64" alt="@indexImage.IndexType" style="width: 150px; height: 150px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px;" />
+                                }
+                                else
+                                {
+                                    <div style="width: 150px; height: 150px; background-color: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #999;">
+                                        Нет данных
+                                    </div>
+                                }
+                            </td>
+                            <td style="padding: 12px; border: 1px solid #e0e0e0; vertical-align: top;">
+                                @if (indexImage.AnomalyCoordinates != null && indexImage.AnomalyCoordinates.Count > 0)
+                                {
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        @foreach (var coord in indexImage.AnomalyCoordinates)
+                                        {
+                                            <div style="background-color: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 4px; padding: 8px; font-size: 12px;">
+                                                <div style="margin-bottom: 4px;"><strong>Широта:</strong> @coord.Latitude.ToString("F5")</div>
+                                                <div><strong>Долгота:</strong> @coord.Longitude.ToString("F5")</div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="color: #999; font-size: 12px;">Аномалий не обнаружено</div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div style="padding: 20px; text-align: center; color: #999;">
+                Данные по индексам отсутствуют
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Indices.Recommendations))
+        {
+            <h3 style="margin-top: 30px; margin-bottom: 10px;">Рекомендации:</h3>
+            <div class="muted">@Model.Indices.Recommendations</div>
+        }
+
+        <div class="print-footer">
+            <span>@Model.Header.ReportNumber • @Model.Header.ReportDate.ToString("dd.MM.yyyy")</span>
+            <span>Стр. 5 из 6</span>
+        </div>
+    </section>
+
+    <!-- Page 6: Подробный анализ -->
+    <section class="page">
+        <h2>Подробный анализ культуры</h2>
+
+        <div>  </div>
+
+        <h3>Наземное обследование</h3>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>Период работы</th>
+                    <th>Статус</th>
+                    <th>Культура</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.BidResults.Rows)
+                {
+                    <tr>
+                        <td>@row.WorkPeriod</td>
+                        <td>@row.Status</td>
+                        <td>@row.Crop</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (Model.AnomalyTable?.Rows != null && Model.AnomalyTable?.Rows.Count > 0)
+        {
+            <h3>Аномалии по фотографиям</h3>
+
+            <!-- summary-блок -->
+            <p class="muted">
+                <strong>Культура:</strong>
+                @(Model.AnomalyTable.Rows.FirstOrDefault()?.Crop ?? "—")
+                &nbsp;|&nbsp;
+                <strong>Найдено аномалий:</strong>
+                @Model.AnomalyTable.Rows.Count
+            </p>
+
+            <div class="table-wrap avoid">
+                <table class="table anomaly-table">
+                    <thead>
+                        <tr>
+                            <th>Фото</th>
+                            <th>Описание аномалии</th>
+                            <th>Тип проблемы</th>
+                            <th>Аномалия 1 / Аномалия 2</th>
+                            <th>Описание классификации</th>
+                            <th>Рекомендации (подготовлены искусственным интеллектом)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model.AnomalyTable.Rows)
+                        {
+                            <tr>
+                                <td class="col-photo" >
+                                    @if (!string.IsNullOrWhiteSpace(r.PhotoDataUri))
+                                    {
+                                        <img src="@r.PhotoDataUri" class="photo" />
+                                    }
+                                    else
+                                    {
+                                        <span class="muted">Фото не найдено в архиве</span>
+                                    }
+                                </td>
+                                <td>@(r.AnomalyDescription ?? "-")</td>
+                                <td>@(r.ProblemType ?? "-")</td>
+                                <td>@(r.Anomaly1 ?? "-") / @(r.Anomaly2 ?? "-")</td>
+                                <td>@(r.ClassificationDescription ?? "-")</td>
+                                <td>@(r.Recommendations ?? "-")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <div class="print-footer">
+            <span>@Model.Header.ReportNumber • @Model.Header.ReportDate.ToString("dd.MM.yyyy")</span>
+            <span>Стр. 6 из 6</span>
+        </div>
+    </section>
+</body>
+</html>

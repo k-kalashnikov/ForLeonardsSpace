@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Masofa.Tests": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

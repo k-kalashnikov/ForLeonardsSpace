@@ -1,0 +1,13 @@
+﻿global using System.Security.Claims;
+global using Masofa.BusinessLogic;
+global using Masofa.Common.Models;
+global using Masofa.Common.Models.Dictionaries;
+global using Masofa.DataAccess;
+global using Masofa.Web.Monolith.Controllers;
+global using MediatR;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.Logging;
+global using Moq;

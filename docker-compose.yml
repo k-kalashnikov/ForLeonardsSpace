@@ -1,0 +1,102 @@
+services:
+  argosence.web.monolith:
+    image: agrosence-web-monilith
+    container_name: masofa-web-monolith-${MODE}
+    env_file:
+      - ./.env
+    build:
+      context: .
+      dockerfile: ./Deploy/Masofa.Web.Monolith/Dockerfile
+      args:
+        - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+    ports:
+      - "${MONOLITH_HTTP_PORT}:8080"
+      - "${MONOLITH_HTTPS_PORT}:443"
+    environment:
+      - MASOFA_WEATHER_DATE_LOADED=2016-02-01
+    networks:
+      - masofa
+    volumes:
+      - ${DEPLOY_ROOT_FOLDER}/masofa-web-monolith-${MODE}/logs:/app/log
+      - ${GEOSERVER_TILES_DIR}:/layers
+      - ${DEPLOY_ROOT_FOLDER}/masofa-web-monolith-${MODE}/weatherReports/report.json:/app/weatherReports/report.json
+  postgres:
+    image: agrosence-postgres
+    env_file: ./.env
+    build:
+      context: .
+      dockerfile: ./Deploy/postgres/Dockerfile
+    container_name: masofa-postgres-${MODE}
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"    
+    volumes:
+      - ${DEPLOY_ROOT_FOLDER}/data-postgres-${MODE}:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - masofa
+  minio:
+    image: agrosence-minio
+    env_file: ./.env
+    build:
+      context: .
+      dockerfile: ./Deploy/minio/Dockerfile
+    container_name: masofa-minio-${MODE}
+    ports:
+      - "${MINIO_HTTP_PORT}:9000" # Web UI / API
+      - "${MINIO_CLI_PORT}:9001" # Console
+    environment:
+      - MINIO_ROOT_USER=${MINIO_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD}
+    command: server /data --console-address :9001
+    volumes:
+      - ${DEPLOY_ROOT_FOLDER}/data-minio-${MODE}:/data
+    restart: always
+    networks:
+      - masofa
+  geoserver:
+    image: agrosence-geoserver
+    env_file: ./.env
+    build:
+      context: .
+      dockerfile: ./Deploy/geoserver/Dockerfile
+    container_name: masofa-geoserver-${MODE}
+    ports:
+      - "${GEOSERVER_HTTP_PORT}:8080" # Web UI / API
+    environment:
+      - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER}
+      - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD}
+    volumes:
+      - ${DEPLOY_ROOT_FOLDER}/geoserver-data-${MODE}:/opt/geoserver/data_dir
+      - ${GEOSERVER_TILES_DIR}:/data/mosaics
+    networks:
+      - masofa
+    depends_on:
+      - minio
+  file-server:
+    image: nginx:alpine
+    container_name: masofa-file-server-${MODE}
+    ports:
+      - "${FTP_PORT_20}:80"
+    volumes:
+      # Замените /path/on/host на вашу папку
+      - ${FTP_FILES_DIR}:/usr/share/nginx/html:ro
+      - ./Deploy/ftp/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./Deploy/ftp/.htpasswd:/etc/nginx/.htpasswd:ro
+    restart: unless-stopped
+  ubuntu:
+    env_file:
+      - ./.env
+    image: ubuntu:24.04
+    container_name: masofa-ubuntu-${MODE}
+    stdin_open: true
+    tty: true         
+    command: tail -f /dev/null
+    volumes:
+      - "${DEPLOY_ROOT_FOLDER}/masofa-ubuntu-${MODE}:/deploy"
+
+networks:
+  masofa:
+    driver: bridge 

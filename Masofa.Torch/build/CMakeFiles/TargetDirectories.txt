@@ -1,0 +1,3 @@
+C:/Users/k-kal/Documents/6grain/MasofaMonolith/Masofa.Torch/build/CMakeFiles/qwen_wrapper.dir
+C:/Users/k-kal/Documents/6grain/MasofaMonolith/Masofa.Torch/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/k-kal/Documents/6grain/MasofaMonolith/Masofa.Torch/build/CMakeFiles/ZERO_CHECK.dir

@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Masofa.Cli.DevopsUtil": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Masofa.Common\Masofa.Common.csproj" />
+    <ProjectReference Include="..\Masofa.DataAccess\Masofa.DataAccess.csproj" />
+  </ItemGroup>
+
+</Project>

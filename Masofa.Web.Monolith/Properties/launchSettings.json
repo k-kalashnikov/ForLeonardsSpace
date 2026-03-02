@@ -1,0 +1,40 @@
+﻿{
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "PROJ_LIB": "$(ProjectDir)bin\\$(Configuration)\\net9.0\\runtimes\\win-x64\\native\\maxrev.gdal.core.libshared",
+        "GDAL_DATA": "$(ProjectDir)bin\\$(Configuration)\\net9.0\\runtimes\\win-x64\\native\\gdal-data"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5162"
+    },
+    "https": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "PROJ_LIB": "$(ProjectDir)bin\\$(Configuration)\\net9.0\\runtimes\\win-x64\\native\\maxrev.gdal.core.libshared",
+        "GDAL_DATA": "$(ProjectDir)bin\\$(Configuration)\\net9.0\\runtimes\\win-x64\\native\\gdal-data"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7088;http://localhost:5162"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "environmentVariables": {
+        "ASPNETCORE_HTTPS_PORTS": "8081",
+        "ASPNETCORE_HTTP_PORTS": "8080",
+        "PROJ_LIB": "$(ProjectDir)bin\\$(Configuration)\\net9.0\\runtimes\\win-x64\\native\\maxrev.gdal.core.libshared",
+        "GDAL_DATA": "$(ProjectDir)bin\\$(Configuration)\\net9.0\\runtimes\\win-x64\\native\\gdal-data"
+      },
+      "publishAllPorts": true,
+      "useSSL": true
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json"
+}

@@ -1,0 +1,79 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Common\Resources\**" />
+		<Compile Remove="Jobs\**" />
+		<Compile Remove="Notification\**" />
+		<Compile Remove="SatelliteLandsat\**" />
+		<Compile Remove="SatelliteSentinel\**" />
+		<Compile Remove="Tiles\**" />
+		<Compile Remove="Weather\**" />
+		<EmbeddedResource Remove="Common\Resources\**" />
+		<EmbeddedResource Remove="Jobs\**" />
+		<EmbeddedResource Remove="Notification\**" />
+		<EmbeddedResource Remove="SatelliteLandsat\**" />
+		<EmbeddedResource Remove="SatelliteSentinel\**" />
+		<EmbeddedResource Remove="Tiles\**" />
+		<EmbeddedResource Remove="Weather\**" />
+		<None Remove="Common\Resources\**" />
+		<Compile Remove="Cli\DbSeeders\Data\**" />
+		<Compile Remove="Jobs\**" />
+		<EmbeddedResource Remove="Cli\DbSeeders\Data\**" />
+		<EmbeddedResource Remove="Jobs\**" />
+		<None Remove="Cli\DbSeeders\Data\**" />
+		<None Remove="Jobs\**" />
+		<None Remove="Notification\**" />
+		<None Remove="SatelliteLandsat\**" />
+		<None Remove="SatelliteSentinel\**" />
+		<None Remove="Tiles\**" />
+		<None Remove="Weather\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Accord.Statistics" Version="3.8.0" />
+		<PackageReference Include="ClosedXML" Version="0.105.0" />
+		<PackageReference Include="CsvHelper" Version="33.1.0" />
+		<PackageReference Include="MaxRev.Gdal.Core" Version="3.11.3.339" />
+		<PackageReference Include="MaxRev.Gdal.WindowsRuntime.Minimal" Version="3.11.3.339" Condition="$([MSBuild]::IsOSPlatform('Windows'))" />
+		<PackageReference Include="MaxRev.Gdal.LinuxRuntime.Minimal" Version="3.11.3.339" Condition="$([MSBuild]::IsOSPlatform('Linux'))" />
+		<PackageReference Include="MediatR" Version="13.0.0" />
+		<PackageReference Include="MetadataExtractor" Version="2.9.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+		<PackageReference Include="OxyPlot.Core" Version="2.2.0" />
+		<PackageReference Include="QRCoder" Version="1.7.0" />
+		<PackageReference Include="Quartz" Version="3.14.0" />
+		<PackageReference Include="NetTopologySuite.CoordinateSystems" Version="1.15.3" />
+		<PackageReference Include="NetTopologySuite.Features" Version="2.2.0" />
+		<PackageReference Include="NetTopologySuite.IO.Esri.Shapefile" Version="1.2.0" />
+		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
+		<PackageReference Include="ProjNET" Version="2.1.0" />
+		<PackageReference Include="RazorLight" Version="2.3.1" />
+		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
+		<PackageReference Include="SkiaSharp" Version="2.88.8" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Masofa.Client.Copernicus\Masofa.Client.Copernicus.csproj" />
+		<ProjectReference Include="..\Masofa.Client.EarthExplorer\Masofa.Client.EarthExplorer.csproj" />
+		<ProjectReference Include="..\Masofa.Client.IBMWeather\Masofa.Client.IBMWeather.csproj" />
+		<ProjectReference Include="..\Masofa.Client.Qwen\Masofa.Client.Qwen.csproj" />
+		<ProjectReference Include="..\Masofa.Common\Masofa.Common.csproj" />
+		<ProjectReference Include="..\Masofa.DataAccess\Masofa.DataAccess.csproj" />
+		<ProjectReference Include="..\Masofa.Depricated.DataAccess\Masofa.Depricated.DataAccess.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Cli\DbSeeders\Csv\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Folder Include="Cli\DbSeeders\Csv\Identity\" />
+	  <Folder Include="Common\Resources\" />
+	</ItemGroup>
+
+</Project>

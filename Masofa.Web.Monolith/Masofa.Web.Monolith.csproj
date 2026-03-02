@@ -1,0 +1,119 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>963797b7-7595-431c-8755-b9bb6f784b10</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+		<Version>2.0.0</Version>
+		<InformationalVersion>2.0.0</InformationalVersion>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Controllers\Logger\**" />
+		<Content Remove="Controllers\Logger\**" />
+		<EmbeddedResource Remove="Controllers\Logger\**" />
+		<None Remove="Controllers\Logger\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ClosedXML" Version="0.105.0" />
+		<PackageReference Include="MaxRev.Gdal.Core" Version="3.11.3.339" />
+		<PackageReference Include="MaxRev.Gdal.WindowsRuntime.Minimal" Version="3.11.3.339" Condition="$([MSBuild]::IsOSPlatform('Windows'))" />
+		<PackageReference Include="MaxRev.Gdal.LinuxRuntime.Minimal" Version="3.11.3.339" Condition="$([MSBuild]::IsOSPlatform('Linux'))" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
+		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.13.1" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.13.1" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+		<PackageReference Include="Minio" Version="6.0.5" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="SharpCompress" Version="0.41.0" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+		<PackageReference Include="SkiaSharp" Version="3.119.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+		<PackageReference Include="NLog" Version="6.0.2" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="6.0.2" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+		<PackageReference Include="Quartz" Version="3.14.0" />
+		<PackageReference Include="Quartz.AspNetCore" Version="3.14.0" />
+		<PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.14.0" />
+		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.14.0" />
+		<PackageReference Include="Quartz.Jobs" Version="3.14.0" />
+		<PackageReference Include="Quartz.Serialization.Json" Version="3.14.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Masofa.BusinessLogic\Masofa.BusinessLogic.csproj" />
+		<ProjectReference Include="..\Masofa.Client.Copernicus\Masofa.Client.Copernicus.csproj" />
+		<ProjectReference Include="..\Masofa.Client.EarthExplorer\Masofa.Client.EarthExplorer.csproj" />
+		<ProjectReference Include="..\Masofa.Client.Era5\Masofa.Client.Era5.csproj" />
+		<ProjectReference Include="..\Masofa.Client.OneId\Masofa.Client.OneId.csproj" />
+		<ProjectReference Include="..\Masofa.Client.Qwen\Masofa.Client.Qwen.csproj" />
+		<ProjectReference Include="..\Masofa.Client.Ugm\Masofa.Client.Ugm.csproj" />
+		<ProjectReference Include="..\Masofa.Common\Masofa.Common.csproj" />
+		<ProjectReference Include="..\Masofa.DataAccess\Masofa.DataAccess.csproj" />
+		<ProjectReference Include="..\Masofa.Depricated.DataAccess\Masofa.Depricated.DataAccess.csproj" />
+	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Masofa.BusinessLogic\Masofa.BusinessLogic.csproj" />
+    <ProjectReference Include="..\Masofa.Client.Copernicus\Masofa.Client.Copernicus.csproj" />
+    <ProjectReference Include="..\Masofa.Client.EarthExplorer\Masofa.Client.EarthExplorer.csproj" />
+    <ProjectReference Include="..\Masofa.Client.IBMWeather\Masofa.Client.IBMWeather.csproj" />
+    <ProjectReference Include="..\Masofa.Common\Masofa.Common.csproj" />
+    <ProjectReference Include="..\Masofa.DataAccess\Masofa.DataAccess.csproj" />
+    <ProjectReference Include="..\Masofa.Depricated.DataAccess\Masofa.Depricated.DataAccess.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Content Update="geoBoundaries-UZB-ADM0_simplified.geojson">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>Web/geoBoundaries-UZB-ADM0_simplified.geojson</TargetPath>
+		</Content>
+	</ItemGroup>
+
+	<Target Name="CopyEmailTemplates" BeforeTargets="Build">
+		<ItemGroup>
+			<EmailTemplate Include="../Masofa.Common/EmailTemplates/*.html" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(EmailTemplate)" DestinationFolder="$(OutputPath)/EmailTemplates" SkipUnchangedFiles="true" />
+	</Target>
+  <ItemGroup>
+    <Folder Include="Jobs\IBMWeather\" />
+  </ItemGroup>
+
+  <Target Name="CopyEmailTemplates" BeforeTargets="Build">
+  	<ItemGroup>
+  	  <EmailTemplate Include="../Masofa.Common/EmailTemplates/*.html" />
+  	</ItemGroup>
+  
+  	<Copy SourceFiles="@(EmailTemplate)" DestinationFolder="$(OutputPath)/EmailTemplates" SkipUnchangedFiles="true" />
+  </Target>
+
+
+	<Target Name="CopySeedersCsv" BeforeTargets="Build">
+		<ItemGroup>
+			<Csv Include="../Masofa.BusinessLogic/Cli/DbSeeders/Csv/**/*" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(Csv)" DestinationFolder="$(OutputPath)/Csv" SkipUnchangedFiles="true" />
+	</Target>
+
+</Project>

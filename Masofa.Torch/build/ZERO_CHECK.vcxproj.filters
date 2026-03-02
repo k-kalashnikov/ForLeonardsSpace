@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\k-kal\Documents\6grain\MasofaMonolith\Masofa.Torch\build\CMakeFiles\eec015c3d71794d2555b845ce5220294\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{B0956182-6063-369A-A615-811A4A56733F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,1206 @@
+openapi: 3.0.3
+info:
+  title: IBM Weather Company Data API
+  description: API для получения погодных данных от IBM Weather Company
+  version: 1.0.0
+  contact:
+    name: IBM Weather API Support
+    url: https://www.ibm.com/docs/en/SSRQLT_suite/topics/r_ctr_weather_api.html
+
+servers:
+  - url: https://api.weather.com/v3
+    description: IBM Weather API Server
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /wx/observations/current:
+    get:
+      summary: Текущие погодные условия
+      description: Получение текущих погодных условий для указанного местоположения
+      parameters:
+        - name: geocode
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "41.3111,69.2797"
+          description: Координаты в формате "широта,долгота"
+        - name: language
+          in: query
+          schema:
+            type: string
+            default: "en-US"
+            enum: [en-US, ru-RU, es-ES, fr-FR, de-DE]
+          description: Язык ответа
+        - name: format
+          in: query
+          schema:
+            type: string
+            default: "json"
+            enum: [json, xml]
+          description: Формат ответа
+        - name: units
+          in: query
+          schema:
+            type: string
+            default: "s"
+            enum: [s, e, h, m]
+          description: Единицы измерения (s-метрическая, e-английская, h-гибридная, m-метрическая с ветром в км/ч)
+        - name: apiKey
+          in: query
+          required: true
+          schema:
+            type: string
+          description: API ключ
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentWeatherResponse'
+
+  /wx/forecast/hourly:
+    get:
+      summary: Почасовой прогноз (48 часов)
+      description: Получение почасового прогноза погоды на ближайшие 48 часов
+      parameters:
+        - name: geocode
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "41.3111,69.2797"
+        - name: language
+          in: query
+          schema:
+            type: string
+            default: "en-US"
+        - name: format
+          in: query
+          schema:
+            type: string
+            default: "json"
+        - name: units
+          in: query
+          schema:
+            type: string
+            default: "s"
+        - name: apiKey
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HourlyForecastResponse'
+
+  /wx/forecast/hourly/10day/enterprise:
+    get:
+      summary: Почасовой прогноз на 10 дней (Enterprise)
+      description: Получение почасового прогноза погоды на 10 дней (требует enterprise подписку)
+      parameters:
+        - name: geocode
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "41.3111,69.2797"
+        - name: language
+          in: query
+          schema:
+            type: string
+            default: "en-US"
+        - name: format
+          in: query
+          schema:
+            type: string
+            default: "json"
+        - name: units
+          in: query
+          schema:
+            type: string
+            default: "s"
+        - name: apiKey
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseHourlyForecastResponse'
+        '403':
+          description: Доступ запрещен (требуется enterprise подписка)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wx/forecast/daily:
+    get:
+      summary: Дневной прогноз
+      description: Получение ежедневного прогноза погоды на 3-10 дней
+      parameters:
+        - name: geocode
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "41.3111,69.2797"
+        - name: language
+          in: query
+          schema:
+            type: string
+            default: "en-US"
+        - name: format
+          in: query
+          schema:
+            type: string
+            default: "json"
+        - name: units
+          in: query
+          schema:
+            type: string
+            default: "s"
+        - name: apiKey
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyForecastResponse'
+
+  /wx/alerts/headlines:
+    get:
+      summary: Погодные оповещения
+      description: Получение информации о текущих погодных оповещениях
+      parameters:
+        - name: geocode
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "41.3111,69.2797"
+        - name: language
+          in: query
+          schema:
+            type: string
+            default: "en-US"
+        - name: format
+          in: query
+          schema:
+            type: string
+            default: "json"
+        - name: apiKey
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherAlertsResponse'
+
+  /wx/observations/historical:
+    get:
+      summary: Исторические данные
+      description: Получение исторических погодных данных
+      parameters:
+        - name: geocode
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "41.3111,69.2797"
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2024-01-01"
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2024-01-31"
+        - name: language
+          in: query
+          schema:
+            type: string
+            default: "en-US"
+        - name: format
+          in: query
+          schema:
+            type: string
+            default: "json"
+        - name: units
+          in: query
+          schema:
+            type: string
+            default: "s"
+        - name: apiKey
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoricalWeatherResponse'
+
+  /wx/forecast/seasonal:
+    get:
+      summary: Сезонный прогноз
+      description: Получение долгосрочных сезонных прогнозов
+      parameters:
+        - name: geocode
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "41.3111,69.2797"
+        - name: language
+          in: query
+          schema:
+            type: string
+            default: "en-US"
+        - name: format
+          in: query
+          schema:
+            type: string
+            default: "json"
+        - name: units
+          in: query
+          schema:
+            type: string
+            default: "s"
+        - name: apiKey
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeasonalForecastResponse'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: query
+      name: apiKey
+
+  schemas:
+    # Модели для входящих параметров
+    GeocodeInput:
+      type: string
+      pattern: '^-?\d+\.?\d*,-?\d+\.?\d*$'
+      example: "41.3111,69.2797"
+      description: Координаты в формате "широта,долгота"
+
+    LanguageInput:
+      type: string
+      enum: [en-US, ru-RU, es-ES, fr-FR, de-DE, it-IT, pt-BR, ja-JP, ko-KR, zh-CN]
+      default: "en-US"
+      description: Язык ответа
+
+    FormatInput:
+      type: string
+      enum: [json, xml]
+      default: "json"
+      description: Формат ответа
+
+    UnitsInput:
+      type: string
+      enum: [s, e, h, m]
+      default: "s"
+      description: "Единицы измерения: s-метрическая, e-английская, h-гибридная, m-метрическая с ветром в км/ч"
+
+    # Модели для ответов
+    CurrentWeatherResponse:
+      type: object
+      properties:
+        metadata:
+          type: object
+          properties:
+            language:
+              type: string
+            transaction_id:
+              type: string
+            version:
+              type: string
+            latitude:
+              type: number
+            longitude:
+              type: number
+            expire_time_gmt:
+              type: integer
+            status_code:
+              type: integer
+        observations:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeatherObservation'
+
+    WeatherObservation:
+      type: object
+      properties:
+        key:
+          type: string
+        class:
+          type: string
+        expire_time_gmt:
+          type: integer
+        obs_id:
+          type: string
+        obs_name:
+          type: string
+        valid_time_gmt:
+          type: integer
+        day_ind:
+          type: string
+        temp:
+          type: number
+        wx_icon:
+          type: integer
+        icon_extd:
+          type: integer
+        wx_phrase:
+          type: string
+        pressure_tend:
+          type: string
+        pressure_desc:
+          type: string
+        dewPt:
+          type: number
+        heat_index:
+          type: number
+        rh:
+          type: number
+        pressure:
+          type: number
+        vis:
+          type: number
+        wc:
+          type: number
+        wdir:
+          type: number
+        wdir_cardinal:
+          type: string
+        gust:
+          type: number
+        wspd:
+          type: number
+        max_temp:
+          type: number
+        min_temp:
+          type: number
+        precip_total:
+          type: number
+        precip_hrly:
+          type: number
+        snow_hrly:
+          type: number
+        uv_desc:
+          type: string
+        feels_like:
+          type: number
+        uv_index:
+          type: number
+        qualifier:
+          type: string
+        qualifier_svrty:
+          type: string
+        blunt_phrase:
+          type: string
+        terse_phrase:
+          type: string
+        clds:
+          type: string
+        water_temp:
+          type: number
+        primary_wave_period:
+          type: number
+        primary_wave_height:
+          type: number
+        primary_swell_period:
+          type: number
+        primary_swell_height:
+          type: number
+        primary_swell_direction:
+          type: string
+        secondary_swell_period:
+          type: number
+        secondary_swell_height:
+          type: number
+        secondary_swell_direction:
+          type: string
+
+    HourlyForecastResponse:
+      type: object
+      properties:
+        metadata:
+          type: object
+          properties:
+            language:
+              type: string
+            transaction_id:
+              type: string
+            version:
+              type: string
+            latitude:
+              type: number
+            longitude:
+              type: number
+            expire_time_gmt:
+              type: integer
+            status_code:
+              type: integer
+        forecasts:
+          type: array
+          items:
+            $ref: '#/components/schemas/HourlyForecast'
+
+    HourlyForecast:
+      type: object
+      properties:
+        class:
+          type: string
+        expire_time_gmt:
+          type: integer
+        fcst_valid:
+          type: integer
+        fcst_valid_local:
+          type: string
+        num:
+          type: integer
+        day_ind:
+          type: string
+        temp:
+          type: number
+        dewpt:
+          type: number
+        hi:
+          type: number
+        wc:
+          type: number
+        feels_like:
+          type: number
+        icon_extd:
+          type: integer
+        wxman:
+          type: string
+        icon_code:
+          type: integer
+        dow:
+          type: string
+        phrase_12char:
+          type: string
+        phrase_22char:
+          type: string
+        phrase_32char:
+          type: string
+        subphrase_pt1:
+          type: string
+        subphrase_pt2:
+          type: string
+        subphrase_pt3:
+          type: string
+        pop:
+          type: number
+        precip_type:
+          type: string
+        qpf:
+          type: number
+        snow_qpf:
+          type: number
+        rh:
+          type: number
+        wspd:
+          type: number
+        wdir:
+          type: number
+        wdir_cardinal:
+          type: string
+        gust:
+          type: number
+        clds:
+          type: number
+        vis:
+          type: number
+        mslp:
+          type: number
+        uv_index_raw:
+          type: number
+        uv_index:
+          type: number
+        uv_warning:
+          type: integer
+        uv_desc:
+          type: string
+        golf_index:
+          type: number
+        golf_category:
+          type: string
+
+    EnterpriseHourlyForecastResponse:
+      allOf:
+        - $ref: '#/components/schemas/HourlyForecastResponse'
+        - type: object
+          properties:
+            extended_forecast:
+              type: boolean
+            enterprise_features:
+              type: object
+              properties:
+                high_resolution:
+                  type: boolean
+                extended_range:
+                  type: boolean
+                advanced_metrics:
+                  type: boolean
+
+    DailyForecastResponse:
+      type: object
+      properties:
+        metadata:
+          type: object
+          properties:
+            language:
+              type: string
+            transaction_id:
+              type: string
+            version:
+              type: string
+            latitude:
+              type: number
+            longitude:
+              type: number
+            expire_time_gmt:
+              type: integer
+            status_code:
+              type: integer
+        forecasts:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyForecast'
+
+    DailyForecast:
+      type: object
+      properties:
+        class:
+          type: string
+        expire_time_gmt:
+          type: integer
+        fcst_valid:
+          type: integer
+        fcst_valid_local:
+          type: string
+        num:
+          type: integer
+        max_temp:
+          type: number
+        min_temp:
+          type: number
+        temp:
+          type: number
+        pop:
+          type: number
+        icon_extd:
+          type: integer
+        icon_code:
+          type: integer
+        dow:
+          type: string
+        phrase_12char:
+          type: string
+        phrase_22char:
+          type: string
+        phrase_32char:
+          type: string
+        subphrase_pt1:
+          type: string
+        subphrase_pt2:
+          type: string
+        subphrase_pt3:
+          type: string
+        snow_phrase:
+          type: string
+        snow_code:
+          type: string
+        snow_icon:
+          type: integer
+        snow_qpf:
+          type: number
+        snow_range:
+          type: string
+        snow_phrase_12char:
+          type: string
+        snow_phrase_22char:
+          type: string
+        snow_phrase_32char:
+          type: string
+        precip_type:
+          type: string
+        precip_phrase:
+          type: string
+        precip_icon:
+          type: integer
+        precip_qpf:
+          type: number
+        precip_range:
+          type: string
+        precip_phrase_12char:
+          type: string
+        precip_phrase_22char:
+          type: string
+        precip_phrase_32char:
+          type: string
+        thunder_enum:
+          type: integer
+        thunder_enum_phrase:
+          type: string
+        qpf:
+          type: number
+        qpf_snow:
+          type: number
+        day:
+          type: object
+          properties:
+            fcst_valid:
+              type: integer
+            fcst_valid_local:
+              type: string
+            day_ind:
+              type: string
+            temp:
+              type: number
+            hi:
+              type: number
+            wc:
+              type: number
+            feels_like:
+              type: number
+            pop:
+              type: number
+            icon_extd:
+              type: integer
+            icon_code:
+              type: integer
+            dow:
+              type: string
+            phrase_12char:
+              type: string
+            phrase_22char:
+              type: string
+            phrase_32char:
+              type: string
+            subphrase_pt1:
+              type: string
+            subphrase_pt2:
+              type: string
+            subphrase_pt3:
+              type: string
+            precip_type:
+              type: string
+            qpf:
+              type: number
+            snow_qpf:
+              type: number
+            rh:
+              type: number
+            wspd:
+              type: number
+            wdir:
+              type: number
+            wdir_cardinal:
+              type: string
+            gust:
+              type: number
+            clds:
+              type: number
+            vis:
+              type: number
+            mslp:
+              type: number
+            uv_index_raw:
+              type: number
+            uv_index:
+              type: number
+            uv_warning:
+              type: integer
+            uv_desc:
+              type: string
+            golf_index:
+              type: number
+            golf_category:
+              type: string
+        night:
+          type: object
+          properties:
+            fcst_valid:
+              type: integer
+            fcst_valid_local:
+              type: string
+            day_ind:
+              type: string
+            temp:
+              type: number
+            hi:
+              type: number
+            wc:
+              type: number
+            feels_like:
+              type: number
+            pop:
+              type: number
+            icon_extd:
+              type: integer
+            icon_code:
+              type: integer
+            dow:
+              type: string
+            phrase_12char:
+              type: string
+            phrase_22char:
+              type: string
+            phrase_32char:
+              type: string
+            subphrase_pt1:
+              type: string
+            subphrase_pt2:
+              type: string
+            subphrase_pt3:
+              type: string
+            precip_type:
+              type: string
+            qpf:
+              type: number
+            snow_qpf:
+              type: number
+            rh:
+              type: number
+            wspd:
+              type: number
+            wdir:
+              type: number
+            wdir_cardinal:
+              type: string
+            gust:
+              type: number
+            clds:
+              type: number
+            vis:
+              type: number
+            mslp:
+              type: number
+            uv_index_raw:
+              type: number
+            uv_index:
+              type: number
+            uv_warning:
+              type: integer
+            uv_desc:
+              type: string
+            golf_index:
+              type: number
+            golf_category:
+              type: string
+
+    WeatherAlertsResponse:
+      type: object
+      properties:
+        metadata:
+          type: object
+          properties:
+            language:
+              type: string
+            transaction_id:
+              type: string
+            version:
+              type: string
+            latitude:
+              type: number
+            longitude:
+              type: number
+            expire_time_gmt:
+              type: integer
+            status_code:
+              type: integer
+        alerts:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeatherAlert'
+
+    WeatherAlert:
+      type: object
+      properties:
+        key:
+          type: string
+        class:
+          type: string
+        expire_time_gmt:
+          type: integer
+        obs_id:
+          type: string
+        obs_name:
+          type: string
+        valid_time_gmt:
+          type: integer
+        day_ind:
+          type: string
+        headline_text:
+          type: string
+        event_description:
+          type: string
+        severity:
+          type: string
+        significance:
+          type: string
+        area_name:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        lat:
+          type: number
+        lon:
+          type: number
+        distance:
+          type: number
+        bearing:
+          type: string
+        wfo:
+          type: string
+        wfo_name:
+          type: string
+        phenomena:
+          type: string
+        etn:
+          type: string
+        etn_phrase:
+          type: string
+        headline:
+          type: string
+        detail_key:
+          type: string
+        source:
+          type: string
+        disclaimer:
+          type: string
+        issue_time_gmt:
+          type: integer
+        expire_time_local:
+          type: string
+        wmo_collective_id:
+          type: string
+        response_types:
+          type: string
+        response:
+          type: string
+        urgency:
+          type: string
+        certainty:
+          type: string
+        area_desc:
+          type: string
+        poly:
+          type: string
+        geocode:
+          type: string
+        same:
+          type: string
+        ugc:
+          type: string
+        fips:
+          type: string
+        nwsheadline:
+          type: string
+        meteoalarm_name:
+          type: string
+        meteoalarm_id:
+          type: string
+        meteoalarm_awareness_type:
+          type: string
+        meteoalarm_awareness_level:
+          type: string
+
+    HistoricalWeatherResponse:
+      type: object
+      properties:
+        metadata:
+          type: object
+          properties:
+            language:
+              type: string
+            transaction_id:
+              type: string
+            version:
+              type: string
+            latitude:
+              type: number
+            longitude:
+              type: number
+            expire_time_gmt:
+              type: integer
+            status_code:
+              type: integer
+        observations:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoricalObservation'
+
+    HistoricalObservation:
+      type: object
+      properties:
+        key:
+          type: string
+        class:
+          type: string
+        expire_time_gmt:
+          type: integer
+        obs_id:
+          type: string
+        obs_name:
+          type: string
+        valid_time_gmt:
+          type: integer
+        day_ind:
+          type: string
+        temp:
+          type: number
+        wx_icon:
+          type: integer
+        icon_extd:
+          type: integer
+        wx_phrase:
+          type: string
+        pressure_tend:
+          type: string
+        pressure_desc:
+          type: string
+        dewPt:
+          type: number
+        heat_index:
+          type: number
+        rh:
+          type: number
+        pressure:
+          type: number
+        vis:
+          type: number
+        wc:
+          type: number
+        wdir:
+          type: number
+        wdir_cardinal:
+          type: string
+        gust:
+          type: number
+        wspd:
+          type: number
+        max_temp:
+          type: number
+        min_temp:
+          type: number
+        precip_total:
+          type: number
+        precip_hrly:
+          type: number
+        snow_hrly:
+          type: number
+        uv_desc:
+          type: string
+        feels_like:
+          type: number
+        uv_index:
+          type: number
+        qualifier:
+          type: string
+        qualifier_svrty:
+          type: string
+        blunt_phrase:
+          type: string
+        terse_phrase:
+          type: string
+        clds:
+          type: string
+        water_temp:
+          type: number
+        primary_wave_period:
+          type: number
+        primary_wave_height:
+          type: number
+        primary_swell_period:
+          type: number
+        primary_swell_height:
+          type: number
+        primary_swell_direction:
+          type: string
+        secondary_swell_period:
+          type: number
+        secondary_swell_height:
+          type: number
+        secondary_swell_direction:
+          type: string
+
+    SeasonalForecastResponse:
+      type: object
+      properties:
+        metadata:
+          type: object
+          properties:
+            language:
+              type: string
+            transaction_id:
+              type: string
+            version:
+              type: string
+            latitude:
+              type: number
+            longitude:
+              type: number
+            expire_time_gmt:
+              type: integer
+            status_code:
+              type: integer
+        forecasts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeasonalForecast'
+
+    SeasonalForecast:
+      type: object
+      properties:
+        class:
+          type: string
+        expire_time_gmt:
+          type: integer
+        fcst_valid:
+          type: integer
+        fcst_valid_local:
+          type: string
+        num:
+          type: integer
+        max_temp:
+          type: number
+        min_temp:
+          type: number
+        temp:
+          type: number
+        pop:
+          type: number
+        icon_extd:
+          type: integer
+        icon_code:
+          type: integer
+        dow:
+          type: string
+        phrase_12char:
+          type: string
+        phrase_22char:
+          type: string
+        phrase_32char:
+          type: string
+        subphrase_pt1:
+          type: string
+        subphrase_pt2:
+          type: string
+        subphrase_pt3:
+          type: string
+        snow_phrase:
+          type: string
+        snow_code:
+          type: string
+        snow_icon:
+          type: integer
+        snow_qpf:
+          type: number
+        snow_range:
+          type: string
+        snow_phrase_12char:
+          type: string
+        snow_phrase_22char:
+          type: string
+        snow_phrase_32char:
+          type: string
+        precip_type:
+          type: string
+        precip_phrase:
+          type: string
+        precip_icon:
+          type: integer
+        precip_qpf:
+          type: number
+        precip_range:
+          type: string
+        precip_phrase_12char:
+          type: string
+        precip_phrase_22char:
+          type: string
+        precip_phrase_32char:
+          type: string
+        thunder_enum:
+          type: integer
+        thunder_enum_phrase:
+          type: string
+        qpf:
+          type: number
+        qpf_snow:
+          type: number
+        seasonal_type:
+          type: string
+        seasonal_period:
+          type: string
+        confidence:
+          type: number
+        trend:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "ACCESS_DENIED"
+            message:
+              type: string
+              example: "You don't have permission to access this endpoint"
+            details:
+              type: string
+              example: "Enterprise subscription required"
+            reference_id:
+              type: string
+              example: "18.e0034917.1756974791.191ae5fa"

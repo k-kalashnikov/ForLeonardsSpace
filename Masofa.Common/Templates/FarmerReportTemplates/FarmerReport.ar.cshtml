@@ -1,0 +1,600 @@
+﻿@using System
+@using Masofa.Common.Models.MasofaAnaliticReport
+@model FarmerRecomendationReport
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Rتوصيات للمزارعين</title>
+    <style>
+        :root {
+            --green: #396d55;
+            --ink: #202428;
+            --muted: #7d8a85;
+            --border: #DFE7E3;
+            --page-bg: #fff;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: #e0ebe4;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            color: var(--ink);
+            line-height: 1.4;
+        }
+
+        @@page {
+            size: A4;
+            margin: 12mm;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            box-sizing: border-box;
+            background: var(--page-bg);
+            margin: 12px auto;
+            padding: 14mm;
+            page-break-after: always;
+            position: relative;
+        }
+
+        /* Обложка */
+        .cover {
+            background: linear-gradient(135deg, #396d55 0%, #2d5a47 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30mm 20mm;
+        }
+
+        .cover-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 20px 0 10px;
+        }
+
+        .cover-subtitle {
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .cover-footer {
+            position: absolute;
+            bottom: 14mm;
+            left: 14mm;
+            right: 14mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* Основная страница */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-masofa {
+            width: 160px;
+            height: 36px;
+        }
+
+        .qr-code {
+            width: 80px;
+            height: 80px;
+            border: 1px solid var(--border);
+        }
+
+        .header-right {
+            text-align: right;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 10px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--green);
+            margin: 20px 0 10px;
+        }
+
+        h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 15px 0 8px;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 12px;
+            margin: 0 0 15px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+
+            .table th,
+            .table td {
+                border: 1px solid var(--border);
+                padding: 6px 8px;
+                vertical-align: top;
+            }
+
+            .table th {
+                background-color: #f8faf8;
+                font-weight: 600;
+            }
+
+        .chart img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .avoid {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        .print-footer {
+            position: absolute;
+            bottom: 14mm;
+            left: 14mm;
+            right: 14mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #667;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Page 1: Обложка -->
+    <section class="page cover">
+        @* <h1 class="cover-title">Министерство сельского хозяйства<br>Республики Узбекистан</h1> *@
+        <h2 class="cover-subtitle">Crop analysis and recommendations</h2>
+        <div class="cover-footer">
+            <span>@Model.Header.ReportNumber • @Model.Header.ReportDate.ToString("dd.MM.yyyy")</span>
+            <span>الصفحة 1 من 5</span>
+        </div>
+    </section>
+
+    <!-- Page 2: Основная информация -->
+    <section class="page">
+        <div class="header-row">
+            <div class="header-left">
+                <img class="logo-masofa" src="data:image/svg+xml;base64,@Model.LogoSvgBase64" alt="MASOFA YER" />
+            </div>
+            <div class="header-right">
+                @Model.Header.ReportDate.ToString("dd.MM.yyyy")<br />
+                @Model.Header.ReportNumber
+            </div>
+        </div>
+
+        <p class="muted">
+            وتستند هذه التوصيات إلى المعلومات المستمدة من النظام، ومراقبة المحاصيل عبر الأقمار الصناعية، والتوصيات الزراعية القياسية.
+        </p>
+
+        <!-- === Блок общей информации в сетке === -->
+        <h2>المعلومات العامة</h2>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; font-size: 12px; position: relative;">
+            <div>
+                <strong>اسم المنطقة</strong><br />
+                @Model.Header.Region
+            </div>
+            <div>
+                <strong>اسم المحصول</strong><br />
+                @Model.Header.CropName
+            </div>
+            <div>
+                <strong>الرقم المساحي</strong><br />
+                @Model.Header.CadastralNumber
+            </div>
+            <div>
+                <strong>معرّف الحقل</strong><br />
+                @Model.Header.FieldIdText
+            </div>
+            <div>
+                <strong>اسم المقاطعة</strong><br />
+                @Model.Header.District
+            </div>
+            <div>
+                <strong>المساحة</strong><br />
+                @Model.Header.AreaHa Га
+            </div>
+            <div>
+                <strong>الإحداثيات (WGS 84)</strong><br />
+                @Model.Header.Wgs84
+            </div>
+            <!-- Пустой блок для выравнивания -->
+            <div></div>
+
+            <!-- QR-код — абсолютное позиционирование -->
+            @if (!string.IsNullOrEmpty(Model.QrSvgBase64))
+            {
+                <div style="position: absolute; top: 0; right: 0; transform: translateX(10px); display: flex; align-items: center; justify-content: center; padding: 10px;">
+                    <img src="data:image/svg+xml;base64,@Model.QrSvgBase64" alt="QR Code" style="width: 80px; height: 80px;" />
+                </div>
+            }
+        </div>
+
+        <!-- Почвенные данные -->
+        <h3>بيانات التربة</h3>
+        <div class="muted">نوع التربة — <b>@Model.Soil.SoilType</b></div>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>تاريخ التحليل</th>
+                    <th>الأس الهيدروجيني (pH)</th>
+                    <th>نسبة الدبال (%)</th>
+                    <th>النيتروجين (ملغم/كغ)</th>
+                    <th>الفوسفور (ملغم/كغ)</th>
+                    <th>نسبة الدبال (%)</th>
+                    <th>الطين (%)</th>
+                    <th>الكثافة (غ/سم³)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Soil.Rows)
+                {
+                    <tr>
+                        <td>@r.AnalysisDate.ToString("dd.MM.yyyy")</td>
+                        <td>@(r.Ph?.ToString("F1") ?? "—")</td>
+                        <td>@(r.HumusPercent?.ToString("F1") ?? "—")</td>
+                        <td>@(r.N?.ToString("F1") ?? "—")</td>
+                        <td>@(r.P?.ToString("F1") ?? "—")</td>
+                        <td>@(r.SandPercent?.ToString("F1") ?? "—")</td>
+                        <td>@(r.ClayPercent?.ToString("F1") ?? "—")</td>
+                        <td>@(r.Density?.ToString("F1") ?? "—")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h3>@Model.Fertilization.Title</h3>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>المحصول</th>
+                    <th>نوع السماد </th>
+                    <th>السماد الطبيعي</th>
+                    <th>النيتروجين</th>
+                    <th>الفوسفور</th>
+                    <th>البوتاسيوم</th>
+                    <th>في الربيع</th>
+                    <th>قبل الزراعة</th>
+                    <th>مع الزراعة</th>
+                    <th>الطبقة العلوية 1</th>
+                    <th>الطبقة العلوية 2</th>
+                    <th>الطبقة العلوية 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.Fertilization.Table.Crop</td>
+                    <td>@Model.Fertilization.Table.Manure</td>
+                    <td>@Model.Fertilization.Table.ManureKgHa</td>
+                    <td>@Model.Fertilization.Table.NKgHa</td>
+                    <td>@Model.Fertilization.Table.PKgHa</td>
+                    <td>@Model.Fertilization.Table.KKgHa</td>
+                    <td>@Model.Fertilization.Table.Spring</td>
+                    <td>@Model.Fertilization.Table.Spring</td>
+                    <td>@Model.Fertilization.Table.BeforeSowing</td>
+                    <td>@Model.Fertilization.Table.WithSowing</td>
+                    <td>@Model.Fertilization.Table.Topdress1</td>
+                    <td>@Model.Fertilization.Table.Topdress2</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 style="margin-top:18px">مراحل النمو الخضري</h3>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>المراحل</th>
+                    <th>أيام</th>
+                    <th>مجموع درجات الحرارة الفعّالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.GrowthStages.Rows)
+                {
+                    <tr>
+                        <td>@r.Stage</td>
+                        <td>@r.Days</td>
+                        <td>@r.Days</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <p class="muted">المرحلة الحالية: <b>@Model.GrowthStages.CurrentPhase</b></p>
+
+        <!-- Нормы полива -->
+        <h3>معايير الري</h3>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>المحصول</th>
+                    <th>الري بالرش</th>
+                    <th>الري بالتنقيط</th>
+                    <th>الري بالقنوات</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.Irrigation.CropName</td>
+                    <td>@Model.Irrigation.SprinklingM3Ha</td>
+                    <td>@Model.Irrigation.DripM3Ha</td>
+                    <td>@Model.Irrigation.FurrowM3Ha</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="print-footer">
+            <span>@Model.Header.ReportNumber • @Model.Header.ReportDate.ToString("dd.MM.yyyy")</span>
+            <span>الصفحة 2 من 5</span>
+        </div>
+    </section>
+
+    <!-- Page 3: Погода -->
+    <!-- Page 3: Результаты мониторинга -->
+    <section class="page">
+        <h2>نتائج المراقبة</h2>
+
+        <!-- Прогноз погоды -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+            <div>
+                <strong>توقعات الطقس</strong><br />
+                <span>@Model.Weather.Region / @Model.Header.District</span>
+            </div>
+            <div class="muted">@Model.Header.ReportDate.ToString("dd.MM.yyyy")</div>
+        </div>
+
+        <!-- Блоки данных -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; font-size: 12px;">
+            <div>
+                <strong>درجة حرارة الهواء</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.AirTemp°C</span>
+            </div>
+            <div>
+                <strong>رطوبة الهواء</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.AirHumidity%</span>
+            </div>
+            <div>
+                <strong>سرعة الرياح</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.WindSpeed м/с</span>
+            </div>
+            <div>
+                <strong>اتجاه الرياح</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.WindDir</span>
+            </div>
+            <div>
+                <strong>هطول الأمطار</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.PrecipMm мм</span>
+            </div>
+            <div>
+                <strong>الإشعاع الشمسي</strong><br />
+                <span style="font-size: 14px; font-weight: bold;">@Model.Weather.SolarJPerCm2 Дж/см²</span>
+            </div>
+            <!-- Пустой блок -->
+            <div></div>
+        </div>
+
+        <!-- Следующие 7 дней -->
+        <h3>الأيام السبعة القادمة</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            @foreach (var day in Model.Weather.Next7Days.Take(7))
+            {
+                var icon = day.Icon == "sun" ? "☀️" : "🌧️";
+                <div style="text-align: center; padding: 10px; background: #f8faf8; border: 1px solid var(--border); border-radius: 5px; flex: 1;">
+                    <div style="font-weight: bold;">@day.Date.DayOfWeek.ToString().Substring(0, 2)</div>
+                    <div style="font-size: 12px;">@day.Date.Day</div>
+                    <div style="margin: 5px 0;">@icon</div>
+                    <div style="font-size: 14px; font-weight: bold;">+@day.DayTempC°C</div>
+                </div>
+            }
+        </div>
+
+        <!-- Графики -->
+        <h3>مخطط درجات الحرارة</h3>
+        <div class="avoid" style="margin-bottom: 15px;">
+            @if (!string.IsNullOrEmpty(Model.TempChartSvgBase64))
+            {
+                <img src="data:image/svg+xml;base64,@Model.TempChartSvgBase64" alt="درجة الحرارة" style="width:100%; height:auto;" />
+            }
+        </div>
+
+        <h3>مخطط هطول الأمطار</h3>
+        <div class="avoid" style="margin-bottom: 15px;">
+            @if (!string.IsNullOrEmpty(Model.RainChartSvgBase64))
+            {
+                <img src="data:image/svg+xml;base64,@Model.RainChartSvgBase64" alt="هطول الأمطار" style="width:100%; height:auto;" />
+            }
+        </div>
+
+        <h3>الإشعاع الشمسي</h3>
+        <div class="avoid" style="margin-bottom: 15px;">
+            @if (!string.IsNullOrEmpty(Model.SolarChartSvgBase64))
+            {
+                <img src="data:image/svg+xml;base64,@Model.SolarChartSvgBase64" alt="الإشعاع الشمسي" style="width:100%; height:auto;" />
+            }
+        </div>
+
+        <!-- Предупреждения -->
+        <h3>⚠️ تنبيهات الانحراف</h3>
+        <div class="muted">
+            @Model.Monitoring.WarningText
+        </div>
+
+        <div class="print-footer">
+            <span>@Model.Header.ReportNumber • @Model.Header.ReportDate.ToString("dd.MM.yyyy")</span>
+            <span>Стр. 3 из 5</span>
+        </div>
+    </section>
+
+    <!-- Page 4: Удобрения и этапы -->
+    <section class="page">
+        <!-- Календарь мероприятий -->
+        <h2>التقويم القياسي للتدابير الزراعية التقنية</h2>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>عدد الأيام منذ تاريخ الزراعة</th>
+                    <th>اسم النشاط</th>
+                    <th>ملاحظة (المعايير)</th>
+                    <th>توصيات التربة</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Calendar.Rows)
+                {
+                    <tr>
+                        <td>@row.DayOffset</td>
+                        <td>@row.Activity</td>
+                        <td>@row.Notes</td>
+                        <td>@row.Recommendation</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Информация о севообороте -->
+        <h3>معلومات تناوب المحاصيل</h3>
+        <table class="table avoid">
+            <thead>
+                <tr>
+                    <th>المحصول</th>
+                    <th>تاريخ الزراعة المخطط</th>
+                    <th>تاريخ الزراعة الفعلي</th>
+                    <th>المساحة (هكتار)</th>
+                    <th>تاريخ الحصاد المخطط</th>
+                    <th>تاريخ الحصاد الفعلي</th>
+                    <th>الإنتاجية لكل هكتار</th>
+                    <th>الحصاد</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.CropRotation.CropName</td>
+                    <td>@(Model.CropRotation.PlannedSowingDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                    <td>@(Model.CropRotation.ActualSowingDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                    <td>@Model.CropRotation.AreaHa.ToString("F1")</td>
+                    <td>@(Model.CropRotation.PlannedHarvestDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                    <td>@(Model.CropRotation.ActualHarvestDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                    <td>@Model.CropRotation.YieldPerHectare.ToString("F1")</td>
+                    <td>@(Model.CropRotation.HarvestDate?.ToString("dd.MM.yyyy") ?? "—")</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="print-footer">
+            <span>@Model.Header.ReportNumber • @Model.Header.ReportDate.ToString("dd.MM.yyyy")</span>
+            <span>الصفحة 4 من 5</span>
+        </div>
+    </section>
+
+    <!-- Page 5: Индексы -->
+    <section class="page">
+        <h2 style="color: #2e7d32; text-align: left; font-size: 24px; margin-bottom: 20px;">مؤشرات الغطاء النباتي</h2>
+        
+        @if (Model.Indices.IndexImages != null && Model.Indices.IndexImages.Count > 0)
+        {
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #e0e0e0;">
+                <thead>
+                    <tr style="background-color: #f5f5f5;">
+                        <th style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">المؤشر</th>
+                        <th style="padding: 12px; border: 1px solid #e0e0e0; text-align: center; font-weight: bold;">القيمة</th>
+                        <th style="padding: 12px; border: 1px solid #e0e0e0; text-align: right; font-weight: bold;">إحداثيات الشذوذ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var indexImage in Model.Indices.IndexImages)
+                    {
+                        <tr>
+                            <td style="padding: 12px; border: 1px solid #e0e0e0; vertical-align: top; text-align: right;">
+                                <strong>@indexImage.IndexType</strong>
+                            </td>
+                            <td style="padding: 12px; border: 1px solid #e0e0e0; text-align: center; vertical-align: middle;">
+                                @if (!string.IsNullOrEmpty(indexImage.ImageBase64))
+                                {
+                                    <img src="data:image/png;base64,@indexImage.ImageBase64" alt="@indexImage.IndexType" style="width: 150px; height: 150px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px;" />
+                                }
+                                else
+                                {
+                                    <div style="width: 150px; height: 150px; background-color: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #999;">
+                                        لا توجد بيانات
+                                    </div>
+                                }
+                            </td>
+                            <td style="padding: 12px; border: 1px solid #e0e0e0; vertical-align: top; text-align: right;">
+                                @if (indexImage.AnomalyCoordinates != null && indexImage.AnomalyCoordinates.Count > 0)
+                                {
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        @foreach (var coord in indexImage.AnomalyCoordinates)
+                                        {
+                                            <div style="background-color: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 4px; padding: 8px; font-size: 12px; text-align: right;">
+                                                <div style="margin-bottom: 4px;"><strong>خط العرض:</strong> @coord.Latitude.ToString("F5")</div>
+                                                <div><strong>خط الطول:</strong> @coord.Longitude.ToString("F5")</div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="color: #999; font-size: 12px; text-align: right;">لم يتم اكتشاف شذوذات</div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div style="padding: 20px; text-align: center; color: #999;">
+                لا توجد بيانات المؤشرات
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Indices.Recommendations))
+        {
+            <h3 style="margin-top: 30px; margin-bottom: 10px;">التوصيات:</h3>
+            <div class="muted">@Model.Indices.Recommendations</div>
+        }
+
+        <div class="print-footer">
+            <span>@Model.Header.ReportNumber • @Model.Header.ReportDate.ToString("dd.MM.yyyy")</span>
+            <span>الصفحة 5 من 5</span>
+        </div>
+    </section>
+
+</body>
+</html>

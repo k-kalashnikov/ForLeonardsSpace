@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ClosedXML" Version="0.105.0" />
+		<PackageReference Include="CsvHelper" Version="33.1.0" />
+		<PackageReference Include="DnsClient" Version="1.8.0" />
+		<PackageReference Include="MailKit" Version="4.13.0" />
+		<PackageReference Include="MaxRev.Gdal.Core" Version="3.11.3.339" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.6" />
+		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.13.1" />
+		<PackageReference Include="MimeKit" Version="4.13.0" />
+		<PackageReference Include="NetTopologySuite" Version="2.6.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="9.0.6" />
+		<PackageReference Include="Minio" Version="6.0.5" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.13.1" />
+		<PackageReference Include="ProjNET" Version="2.1.0" />
+		<PackageReference Include="RazorLight" Version="2.3.1" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.4" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Templates\EmailTemplates\*.html">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<Content Include="Templates\FarmerReportTemplates\*.svg">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Resources\" />
+	</ItemGroup>
+
+	<Target Name="CopyEmailTemplates" BeforeTargets="Build">
+		<ItemGroup>
+			<EmailTemplate Include="../Masofa.Common/Templates/EmailTemplates/*.html" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(EmailTemplate)" DestinationFolder="$(OutputPath)/Templates/EmailTemplates" SkipUnchangedFiles="true" />
+	</Target>
+
+	<Target Name="CopyFarmerReportTemplates" BeforeTargets="Build">
+		<ItemGroup>
+			<FarmerReportTemplates Include="../Masofa.Common/FarmerReportTemplates/*.svg" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(FarmerReportTemplates)" DestinationFolder="$(OutputPath)/FarmerReportTemplates" SkipUnchangedFiles="true" />
+	</Target>
+
+</Project>

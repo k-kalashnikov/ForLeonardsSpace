@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\k-kal\Documents\6grain\MasofaMonolith\Masofa.Torch\qwen_wrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\k-kal\Documents\6grain\MasofaMonolith\Masofa.Torch\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{630E9BA3-681A-35B3-8112-A941C7E0C4FC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
